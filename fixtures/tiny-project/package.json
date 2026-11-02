@@ -1,0 +1,7 @@
+{
+  "name": "tiny-tasks-fixture",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A small TypeScript task tracker used as the Lesson 1 workspace."
+}

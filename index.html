@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A hands-on Lesson 1 companion for Claude Agent SDK TypeScript 0.3.310. Explore a query, its message stream, and the package map."
+    />
+    <title>Lesson 01 · Agent Lab</title>
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to the lab</a>
+    <header class="site-header wrap">
+      <a class="brand" href="#" aria-label="Agent Lab home"
+        ><span class="brand-mark" aria-hidden="true">&lt;/&gt;</span
+        ><span>Agent Lab <small>LESSON 01</small></span></a
+      >
+      <div class="header-right">
+        <span class="version" id="version">SDK 0.3.310</span
+        ><a
+          class="repo-link"
+          href="https://github.com/luiscoco/claude-agent-sdk-lesson-01"
+          target="_blank"
+          rel="noopener noreferrer"
+          >View source ↗</a
+        >
+      </div>
+    </header>
+    <main id="main" class="wrap">
+      <section class="hero" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">INTRODUCTION &amp; PACKAGE MAP</p>
+          <h1 id="page-title">An agent loop.<br /><span>Made visible.</span></h1>
+          <p class="hero-copy">
+            Follow one small task from the host application to the final result. See the messages in
+            between, then explore where the SDK fits.
+          </p>
+          <div class="hero-badges">
+            <span class="pill teal">● No API key needed for the demo</span
+            ><span class="quiet">TypeScript · Claude Agent SDK</span>
+          </div>
+        </div>
+        <aside class="lesson-note">
+          <span class="lesson-number">01<span>/ 09</span></span
+          ><strong>Start with one query.</strong>
+          <p>Understand the host, the agent, and the stream before adding more capabilities.</p>
+          <span class="note-line"></span
+          ><small>A course companion by<br /><b>Luis Coco Enríquez</b></small>
+        </aside>
+      </section>
+      <nav class="tabs" role="tablist" aria-label="Lesson activities">
+        <button
+          role="tab"
+          id="tab-run"
+          aria-controls="panel-run"
+          aria-selected="true"
+          data-tab="run"
+        >
+          01 <span>Run the agent</span>
+        </button>
+        <button
+          role="tab"
+          id="tab-packages"
+          aria-controls="panel-packages"
+          aria-selected="false"
+          tabindex="-1"
+          data-tab="packages"
+        >
+          02 <span>Package map</span>
+        </button>
+        <button
+          role="tab"
+          id="tab-concepts"
+          aria-controls="panel-concepts"
+          aria-selected="false"
+          tabindex="-1"
+          data-tab="concepts"
+        >
+          03 <span>How it works</span>
+        </button>
+        <button
+          role="tab"
+          id="tab-practice"
+          aria-controls="panel-practice"
+          aria-selected="false"
+          tabindex="-1"
+          data-tab="practice"
+        >
+          04 <span>Check your understanding</span>
+        </button>
+      </nav>
+
+      <section id="panel-run" role="tabpanel" aria-labelledby="tab-run">
+        <div class="flow" aria-label="Query lifecycle">
+          <div class="flow-step" data-stage="host">
+            <span class="step-number">1</span>
+            <div><strong>Host application</strong><small>Prompt + configuration</small></div>
+          </div>
+          <div class="flow-step" data-stage="agent">
+            <span class="step-number">2</span>
+            <div><strong>Agent loop</strong><small>Inspect + choose actions</small></div>
+          </div>
+          <div class="flow-step" data-stage="stream">
+            <span class="step-number">3</span>
+            <div><strong>Message stream</strong><small>Observe the work</small></div>
+          </div>
+          <div class="flow-step" data-stage="result">
+            <span class="step-number">4</span>
+            <div><strong>Final result</strong><small>Check the outcome</small></div>
+          </div>
+        </div>
+        <p id="stage-caption" class="stage-caption" aria-live="polite">
+          Start the guided demo to follow the lifecycle.
+        </p>
+        <div id="notice" class="notice" role="alert" hidden></div>
+        <div class="lab-grid">
+          <section class="card host-card" aria-labelledby="host-heading">
+            <div class="card-title">
+              <div>
+                <p class="eyebrow">THE INPUT</p>
+                <h2 id="host-heading">Your host application</h2>
+              </div>
+              <span class="tag">Node.js</span>
+            </div>
+            <label for="mode">Run mode</label
+            ><select id="mode">
+              <option value="demo">Guided demo · no model calls</option>
+              <option value="live" disabled>Live SDK · configure a server API key</option>
+            </select>
+            <p id="mode-help" class="help">
+              A fixed, simulated message replay. It reads the fixture files but does not call Claude
+              or answer custom prompts.
+            </p>
+            <label for="prompt">The task <span class="label-note">prompt</span></label
+            ><textarea
+              id="prompt"
+              rows="5"
+              maxlength="2000"
+              readonly
+              aria-describedby="mode-help"
+            ></textarea>
+            <div class="run-actions">
+              <button id="run" class="button primary" disabled>
+                Run guided demo <span aria-hidden="true">→</span></button
+              ><button id="stop" class="button secondary" disabled>Stop</button>
+            </div>
+            <div class="workspace-head">
+              <p class="eyebrow">WORKSPACE</p>
+              <span class="tag">read-only tools</span>
+            </div>
+            <p class="workspace-path">fixtures / <strong>tiny-project</strong></p>
+            <div id="file-list" class="file-list" aria-label="Fixture files"></div>
+            <details class="file-preview">
+              <summary>Inspect the selected file</summary>
+              <pre><code id="file-content"></code></pre>
+            </details>
+            <p class="boundary-note">
+              The browser sends a request to the Node.js host. The SDK and any API key stay on the
+              server.
+            </p>
+          </section>
+          <div class="output-column">
+            <section class="card stream-card" aria-labelledby="stream-heading">
+              <div class="stream-title">
+                <div>
+                  <p class="eyebrow">THE OBSERVATION</p>
+                  <h2 id="stream-heading">Message stream</h2>
+                </div>
+                <span id="run-status" class="status">Ready</span>
+              </div>
+              <div class="stream-meta">
+                <code>for await (const msg of q)</code><span id="message-count">0 messages</span>
+              </div>
+              <div class="timeline-scroll" id="timeline-scroll">
+                <div id="empty-state" class="empty-state">
+                  <span class="empty-symbol" aria-hidden="true">{ ··· }</span>
+                  <h3>Ready when you are.</h3>
+                  <p>
+                    Run the demo and watch <code>msg.type</code><br />tell the story of the query.
+                  </p>
+                </div>
+                <ol id="timeline" class="timeline" aria-label="SDK messages"></ol>
+              </div>
+              <div class="stream-footer">
+                <span id="elapsed">A stream includes intermediate activity.</span
+                ><button id="export" class="text-button" disabled>Export trace ↓</button>
+              </div>
+            </section>
+            <section class="result-card" id="result-card" aria-labelledby="result-heading">
+              <div class="result-top">
+                <h2 id="result-heading">Final result</h2>
+                <span id="result-label" class="tag">not received</span>
+              </div>
+              <p id="result-text">
+                Waiting for a result message. An assistant message alone does not mean the run has
+                finished.
+              </p>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-packages" role="tabpanel" aria-labelledby="tab-packages" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">CHOOSE AN ENTRY POINT</p>
+          <h2>One package. Different surfaces.</h2>
+          <p>
+            This map comes from the installed version’s <code>package.json</code> exports. Start
+            with the root package for the first Node.js query.
+          </p>
+        </div>
+        <div id="package-grid" class="package-grid"></div>
+        <details class="additional-exports">
+          <summary>Other entries in this installed package</summary>
+          <div id="additional-exports"></div>
+        </details>
+        <div class="version-note">
+          <strong>Keep the version context.</strong>
+          <p>
+            This sample pins SDK 0.3.310. A runtime export is not a stability guarantee: read API
+            status labels and the matching release notes.
+          </p>
+          <div class="status-legend">
+            <span><b class="stable">Stable</b> A supported starting point</span
+            ><span><b class="experimental">Experimental</b> May change</span
+            ><span><b class="deprecated">Deprecated</b> Follow its replacement guidance</span
+            ><span><b class="historical">Historical</b> Older examples need context</span>
+          </div>
+          <a
+            href="https://github.com/anthropics/claude-agent-sdk-typescript/releases/tag/v0.3.310"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Read the 0.3.310 release notes ↗</a
+          >
+        </div>
+      </section>
+
+      <section id="panel-concepts" role="tabpanel" aria-labelledby="tab-concepts" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">THE SMALL EXAMPLE UNDER THE UI</p>
+          <h2>The host starts. The agent works. The host observes.</h2>
+          <p>
+            The live path uses the root SDK on Node.js. The guided demo replays selected message
+            fields so you can learn without a model account.
+          </p>
+        </div>
+        <div class="concept-grid">
+          <div class="code-card">
+            <div class="code-title">TypeScript · the first query</div>
+            <pre><code id="first-query-code"></code></pre>
+          </div>
+          <div class="concept-notes">
+            <article>
+              <span>01</span>
+              <h3>The host supplies context</h3>
+              <p>
+                <code>prompt</code> describes the task. <code>options.cwd</code> chooses the
+                project. Configuration belongs inside <code>options</code>.
+              </p>
+            </article>
+            <article>
+              <span>02</span>
+              <h3>The agent can take steps</h3>
+              <p>
+                A query can inspect files, request tools, and continue. In this sample, only Read,
+                Glob, and Grep are available in live mode.
+              </p>
+            </article>
+            <article>
+              <span>03</span>
+              <h3>The stream is more than an answer</h3>
+              <p>
+                Initialization, assistant activity, and tool results can arrive before a
+                <code>result</code>. Check its subtype and error flag.
+              </p>
+            </article>
+            <article>
+              <span>04</span>
+              <h3>The host owns cleanup</h3>
+              <p>
+                <code>finally</code> closes the handle on success, failure, or cancellation. See
+                <code>src/examples/first-query.ts</code> for the runnable example.
+              </p>
+            </article>
+          </div>
+        </div>
+        <div class="callout">
+          <strong>Two different kinds of streaming</strong>
+          <p>
+            The SDK yields messages to the Node.js host. This sample then uses HTTP server-sent
+            events to display a teaching view in the browser. That HTTP connection is our
+            application’s transport.
+          </p>
+        </div>
+      </section>
+
+      <section id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" hidden>
+        <div class="panel-intro">
+          <p class="eyebrow">EXPLAIN · OBSERVE · APPLY</p>
+          <h2>Make the concepts yours.</h2>
+          <p>
+            Run the demo, expand a message envelope, and identify which message actually reports the
+            outcome.
+          </p>
+        </div>
+        <form id="quiz" class="quiz">
+          <div id="quiz-questions"></div>
+          <div class="quiz-actions">
+            <button class="button primary" type="submit">Check my answers</button
+            ><button class="button secondary" type="reset">Reset</button
+            ><output id="quiz-score" aria-live="polite"></output>
+          </div>
+        </form>
+        <div class="callout">
+          <strong>Your next small experiment</strong>
+          <p>
+            Write a focused summary prompt for Tiny Tasks. Predict which messages you would see
+            before the result. With your own API key, switch to live mode and compare your
+            prediction with the trace.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer wrap">
+      <span>Lesson 1 · Introduction and Package Map</span
+      ><span>A learning sample by Luis Coco Enríquez · MIT licensed</span>
+    </footer>
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>
