@@ -489,7 +489,7 @@ small {
 .stage-caption,
 .stream-meta,
 .stream-footer,
-.result-card p {
+#result-text {
   color: var(--muted);
 }
 .course-reading,

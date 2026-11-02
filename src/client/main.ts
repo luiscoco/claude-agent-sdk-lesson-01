@@ -11,6 +11,7 @@ import {
   type Mode,
   type Stage,
 } from '../shared/lesson.js';
+import { renderMarkdown } from './markdown.js';
 import { createEventParser } from '../shared/sse.js';
 const el = <T extends HTMLElement = HTMLElement>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -73,6 +74,15 @@ function status(text: string, kind = '') {
   el('#run-status').textContent = text;
   el('#run-status').className = `status ${kind}`;
 }
+// Assistant text and successful results are model Markdown; tool output and errors stay literal.
+const isModelText = (view: MessageView) =>
+  view.type === 'assistant' || (view.type === 'result' && Boolean(view.final?.ok));
+function modelText(target: HTMLElement, text: string, markdown: boolean) {
+  if (markdown) renderMarkdown(target, text);
+  else target.textContent = text;
+  target.classList.toggle('markdown', markdown);
+  return target;
+}
 function message(view: MessageView) {
   messages.push(view);
   el('#empty-state').hidden = true;
@@ -97,7 +107,7 @@ function message(view: MessageView) {
       EXPLANATIONS[view.type] ?? 'A runtime message observed by the host.',
       'message-explanation',
     ),
-    node('p', view.text, 'message-text'),
+    modelText(node('div', undefined, 'message-text'), view.text, isModelText(view)),
     node('p', 'Selected message fields', 'envelope-label'),
   );
   const pre = node('pre');
@@ -109,7 +119,7 @@ function message(view: MessageView) {
   const scroll = el('#timeline-scroll');
   scroll.scrollTop = scroll.scrollHeight;
   if (view.final) {
-    el('#result-text').textContent = view.final.text;
+    modelText(el('#result-text'), view.final.text, view.final.ok);
     el('#result-label').textContent = view.final.ok ? 'success' : 'error';
     el('#result-card').className = `result-card ${view.final.ok ? 'received' : 'failed'}`;
   }
@@ -157,8 +167,11 @@ async function startRun() {
   el('#timeline').replaceChildren();
   el('#empty-state').hidden = false;
   el('#message-count').textContent = '0 messages';
-  el('#result-text').textContent =
-    'Waiting for a result message. An assistant message alone does not mean the run has finished.';
+  modelText(
+    el('#result-text'),
+    'Waiting for a result message. An assistant message alone does not mean the run has finished.',
+    false,
+  );
   el('#result-label').textContent = 'not received';
   el('#result-card').className = 'result-card';
   notice();
