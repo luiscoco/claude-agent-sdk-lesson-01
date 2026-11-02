@@ -11,6 +11,7 @@ import {
   type Mode,
   type Stage,
 } from '../shared/lesson.js';
+import { observeCode } from './highlight.js';
 import { renderMarkdown } from './markdown.js';
 import { createEventParser } from '../shared/sse.js';
 const el = <T extends HTMLElement = HTMLElement>(selector: string): T => {
@@ -29,6 +30,7 @@ const prompt = el<HTMLTextAreaElement>('#prompt');
 const run = el<HTMLButtonElement>('#run');
 const stop = el<HTMLButtonElement>('#stop');
 const exportButton = el<HTMLButtonElement>('#export');
+observeCode();
 let info: LessonInfo;
 let controller: AbortController | undefined;
 let messages: MessageView[] = [];
@@ -264,21 +266,22 @@ function packageMap(lesson: LessonInfo) {
       ),
     );
     card.append(top, node('code', entry.path, 'package-path'), node('p', entry.purpose));
-    const code = node('pre');
+    const code = node('pre', undefined, 'code-light');
+    code.dataset.lang = 'ts';
     code.append(node('code', entry.example));
     card.append(code);
     const manifest = node('details');
-    manifest.append(
-      node('summary', 'See the installed export target'),
-      node(
-        'pre',
-        JSON.stringify(
-          { ...(entry.runtime ? { default: entry.runtime } : {}), types: entry.types },
-          null,
-          2,
-        ),
+    const target = node(
+      'pre',
+      JSON.stringify(
+        { ...(entry.runtime ? { default: entry.runtime } : {}), types: entry.types },
+        null,
+        2,
       ),
+      'code-light',
     );
+    target.dataset.lang = 'json';
+    manifest.append(node('summary', 'See the installed export target'), target);
     card.append(manifest);
     el('#package-grid').append(card);
   }
@@ -333,6 +336,13 @@ function quiz() {
 el('#first-query-code').textContent =
   `import { query } from '@anthropic-ai/claude-agent-sdk';\n\nconst q = query({\n  prompt: 'Read README.md and summarize this project.',\n  options: {\n    cwd: fixtureDirectory,\n    tools: ['Read', 'Glob', 'Grep'],\n    allowedTools: ['Read', 'Glob', 'Grep'],\n    permissionMode: 'dontAsk'\n  }\n});\n\ntry {\n  for await (const msg of q) {\n    console.log(msg.type);\n    if (msg.type === 'result' &&\n        msg.subtype === 'success' && !msg.is_error) {\n      console.log(msg.result);\n    }\n  }\n} finally {\n  q.close();\n}`;
 quiz();
+// Colour fixture files by extension; the README stays plain text.
+function showFile(file: FixtureFile) {
+  const content = el('#file-content');
+  const ext = /\.(\w+)$/.exec(file.path)?.[1];
+  content.dataset.lang = ext === 'ts' || ext === 'json' ? ext : 'none';
+  content.textContent = file.content;
+}
 async function boot() {
   const [lessonResponse, fixtureResponse] = await Promise.all([
     fetch('/api/lesson'),
@@ -362,11 +372,11 @@ async function boot() {
       }
       button.classList.add('selected');
       button.setAttribute('aria-pressed', 'true');
-      el('#file-content').textContent = file.content;
+      showFile(file);
     });
     el('#file-list').append(button);
   }
-  el('#file-content').textContent = files[0]?.content ?? '';
+  if (files[0]) showFile(files[0]);
   packageMap(info);
   updateMode();
   run.disabled = false;

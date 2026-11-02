@@ -154,7 +154,7 @@
             <div id="file-list" class="file-list" aria-label="Fixture files"></div>
             <details class="file-preview">
               <summary>Inspect the selected file</summary>
-              <pre><code id="file-content"></code></pre>
+              <pre class="code-light"><code id="file-content"></code></pre>
             </details>
             <p class="boundary-note">
               The browser sends a request to the Node.js host. The SDK and any API key stay on the
@@ -171,7 +171,8 @@
                 <span id="run-status" class="status">Ready</span>
               </div>
               <div class="stream-meta">
-                <code>for await (const msg of q)</code><span id="message-count">0 messages</span>
+                <code data-lang="ts">for await (const msg of q)</code
+                ><span id="message-count">0 messages</span>
               </div>
               <div class="timeline-scroll" id="timeline-scroll">
                 <div id="empty-state" class="empty-state">
