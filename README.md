@@ -4,7 +4,7 @@
 
 See what sits between a prompt and an answer. This small application makes Lesson 1's host, agent loop, message stream, and final result visible, then lets you inspect the installed package's entry points.
 
-![Agent Lab showing the completed guided demo](docs/agent-lab.png)
+![Refreshed course interface with larger text](docs/visual-refresh-desktop.png)
 
 ## Start here
 
@@ -133,3 +133,5 @@ The SDK documentation evolves. Use the installed 0.3.310 declarations as the cod
 ## License
 
 MIT © Luis Coco Enríquez. This is an independent educational sample, not an official Anthropic product.
+
+See [visual style and reading controls](docs/visual-style.md) for the refreshed reference palette, larger typography, and persistent text-size setting.
